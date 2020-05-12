@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -18,6 +19,7 @@ public class Gui extends JFrame {
      */
     private static final long serialVersionUID = 1L;
     public static JTextArea result;
+    public static String fileName = "playlist";
     public Gui(final String title) {
         super(title);
         this.setSize(720, 480);
@@ -28,14 +30,13 @@ public class Gui extends JFrame {
         this.add(createArea());
     }
 
-    private JPanel createArea() { 
+    private JPanel createArea() {
         Background jp = new Background(Youtube.path);
         jp.setLayout(new BorderLayout());
 
         JPanel center = new JPanel();
-        center.setLayout(new BoxLayout(center,BoxLayout.Y_AXIS));
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         center.setOpaque(false);
-        
 
         JPanel OptionArea = new JPanel();
         OptionArea.setOpaque(false);
@@ -57,60 +58,56 @@ public class Gui extends JFrame {
         JTextField jtf = new JTextField(30);
         jtf.setAlignmentX(CENTER_ALIGNMENT);
 
-        
         result = new JTextArea("等待網址。。。");
         result.setEditable(false);
         JScrollPane showResult = new JScrollPane(result);
-        showResult.setPreferredSize(new Dimension(100,100));
+        showResult.setPreferredSize(new Dimension(100, 100));
 
-      
         JButton download = new JButton("下載");
         JButton clear = new JButton("清空");
         download.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-                String function = ((String)type.getSelectedItem());
-                Youtube.type = ((String)formate.getSelectedItem());
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String function = ((String) type.getSelectedItem());
+                Youtube.type = ((String) formate.getSelectedItem());
                 Youtube.url = jtf.getText();
-                if(function == "單首")
-                {
-                    Youtube.DownLoadOne();  
-                }else{
+                if (function == "單首") {
+                    Youtube.DownLoadOne();
+                } else {
+                    fileName = JOptionPane.showInputDialog("輸入清單名稱", fileName);
                     Youtube.DownLoadPlayList();
                 }
-			}
+            }
         });
         clear.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 jtf.setText("");
-			}
+            }
         });
 
         OptionArea.add(type);
         OptionArea.add(formate);
         textArea.add(jtf);
         ButtonArea.add(download);
-        ButtonArea.add(Box.createRigidArea(new Dimension(10,0)));
+        ButtonArea.add(Box.createRigidArea(new Dimension(10, 0)));
         ButtonArea.add(clear);
 
-        center.add(Box.createRigidArea(new Dimension(10,20)));
+        center.add(Box.createRigidArea(new Dimension(10, 20)));
         center.add(OptionArea);
         center.add(title);
-        center.add(Box.createRigidArea(new Dimension(10,20)));
+        center.add(Box.createRigidArea(new Dimension(10, 20)));
         center.add(textArea);
         center.add(ButtonArea);
-        center.add(Box.createRigidArea(new Dimension(10,20)));
+        center.add(Box.createRigidArea(new Dimension(10, 20)));
         center.add(showResult);
-        center.add(Box.createRigidArea(new Dimension(10,100)));
+        center.add(Box.createRigidArea(new Dimension(10, 100)));
 
-        jp.add(Box.createRigidArea(new Dimension(300,100)),BorderLayout.WEST);
+        jp.add(Box.createRigidArea(new Dimension(300, 100)), BorderLayout.WEST);
         jp.add(center);
 
         return jp;
     }
-
-
 
 
 }
