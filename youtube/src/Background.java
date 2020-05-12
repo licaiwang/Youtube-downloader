@@ -1,5 +1,7 @@
 
 import javax.swing.*;
+import java.net.URL;
+
 import java.awt.*;
 public class Background extends JPanel{
     private static final long serialVersionUID = 1L;
@@ -15,7 +17,8 @@ public class Background extends JPanel{
     }
 
     private void drawBackground(Graphics g) {
-        Image image = new ImageIcon(Path+"/res/background.jpg").getImage();
+    	URL url = this.getClass().getResource("/res/background.jpg");
+        Image image = new ImageIcon(url).getImage();
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
     }
 }

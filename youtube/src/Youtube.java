@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class Youtube {
@@ -25,11 +27,10 @@ public class Youtube {
 
     public static void DownLoadPlayList() {
         // 下載播放清單
-        if(Gui.fileName == null)
-        {
+        if (Gui.fileName == null) {
             Gui.fileName = "playlist";
         }
-        createFile("/download_music/"+Gui.fileName);
+        createFile("/download_music/" + Gui.fileName);
         String cmd = getCmd(Youtube.type);
         ExcuteCmd(cmd, "網址異常");
         moveFile(1);
@@ -46,7 +47,8 @@ public class Youtube {
                     ExcuteCmd(cmd_0, "移動失敗，請手動移動檔案");
                     break;
                 case 1:
-                    String cmd_1 = "cmd /c move " + '"' + path + music.get(index) + '"' + " ./download_music/"+Gui.fileName;
+                    String cmd_1 = "cmd /c move " + '"' + path + music.get(index) + '"' + " ./download_music/"
+                            + Gui.fileName;
                     downLoadMusic += ("已下載   ------   " + music.get(index) + "\n");
                     ExcuteCmd(cmd_1, "移動失敗，請手動移動檔案");
                     break;
@@ -64,6 +66,46 @@ public class Youtube {
         Process process;
         try {
             process = Runtime.getRuntime().exec(cmd);
+            new Thread() {
+                @Override
+                public void run() {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line = null;
+                    try {
+                        while ((line = in.readLine()) != null) {
+                            Gui.result.setText(errorMsg +" ---- "+ line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
+            new Thread() {
+                @Override
+                public void run() {
+                    BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                    String line = null;
+                    try {
+                        while ((line = err.readLine()) != null) {
+                            Gui.result.setText(errorMsg +" ---- "+ line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            err.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
             int done = process.waitFor();
             if (done != 0) {
                 // 如果不正常退出就關掉
