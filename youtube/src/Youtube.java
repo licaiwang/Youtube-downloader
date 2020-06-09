@@ -72,7 +72,8 @@ public class Youtube {
         for (int index = 0; index < music.size(); index++) {
             switch (i) {
                 case 0:
-                    String cmd_0 = "cmd /c  move  " + '"' + path + music.get(index) + '"' + " ./download_music";
+                    String cmd_0 = "cmd /c  move  " + '"' + path +'\\'+ music.get(index) + '"' + " ./download_music";
+                    System.out.println(cmd_0);
                     downLoadMusic = "已下載   ------   " + music.get(index);
                     ExcuteCmd(cmd_0, "移動失敗，請手動移動檔案");
                     break;
@@ -107,11 +108,13 @@ public class Youtube {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Gui.result.setText(errorMsg + " ---- " + line);
                     } finally {
                         try {
                             in.close();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Gui.result.setText(errorMsg + " ---- " + line);
                         }
                     }
                 }
@@ -127,11 +130,13 @@ public class Youtube {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Gui.result.setText(errorMsg + " ---- " + line);
                     } finally {
                         try {
                             err.close();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Gui.result.setText(errorMsg + " ---- " + line);
                         }
                     }
                 }
