@@ -1,8 +1,14 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.net.URISyntaxException;
 
 public class Youtube {
     public static String url = "";
@@ -12,45 +18,69 @@ public class Youtube {
     public static Boolean IsPlayList = false;
     static String downLoadMusic = "";
 
-    public static void main(String[] args) {
-        createFile("/download_music");
-        Gui gui = new Gui("¸Ûªº Youtube ¤U¸ü¾¹");
+    public static void main(String[] args) throws IOException, URISyntaxException {
+
+        if (!checkNecessaryRes("/ffmpeg.exe")) {
+            // æ²’æœ‰å€‹æ ¸å¿ƒæª”æ¡ˆçš„è©±ï¼Œå…ˆè§£å£“ç¸®å‡ºä¾†
+            InputStream ffmpeg = Youtube.class.getResourceAsStream("/res/ffmpeg.exe");
+            writeTempFile(ffmpeg, "ffmpeg.exe");
+        }
+        if (!checkNecessaryRes("/youtube-dl.exe")) {
+             // æ²’æœ‰å€‹æ ¸å¿ƒæª”æ¡ˆçš„è©±ï¼Œå…ˆè§£å£“ç¸®å‡ºä¾†
+            InputStream youtube = Youtube.class.getResourceAsStream("/res/youtube-dl.exe");
+            writeTempFile(youtube, "youtube-dl.exe");
+        }
+
+        if (!checkNecessaryRes("/download_music")) {
+             // æ²’æœ‰ä¸‹è¼‰éŸ³æ¨‚çš„è³‡æ–™å¤¾çš„è©±å°±å»ºä¸€å€‹
+            createFile("/download_music");
+        }
+        Gui gui = new Gui("èª çš„ Youtube ä¸‹è¼‰å™¨");
         gui.setVisible(true);
     }
 
+    private static boolean checkNecessaryRes(String name) {
+        // æª¢æŸ¥å¿…è¦è³‡æº
+        File f = new File(path + name);
+        if (f.exists()) {
+            return true;
+        }
+        return false;
+    }
+
     public static void DownLoadOne() {
-        // ¤U¸ü³æ¦±
+        // ä¸‹è¼‰å–®æ›²
         String cmd = getCmd(Youtube.type);
-        ExcuteCmd(cmd, "ºô§}²§±`");
+        ExcuteCmd(cmd, "ç¶²å€ç•°å¸¸");
         moveFile(0);
     }
 
     public static void DownLoadPlayList() {
-        // ¤U¸ü¼½©ñ²M³æ
+        // ä¸‹è¼‰æ’­æ”¾æ¸…å–®
         if (Gui.fileName == null) {
             Gui.fileName = "playlist";
         }
         createFile("/download_music/" + Gui.fileName);
         String cmd = getCmd(Youtube.type);
-        ExcuteCmd(cmd, "ºô§}²§±`");
+        ExcuteCmd(cmd, "ç¶²å€ç•°å¸¸");
         moveFile(1);
     }
 
     private static void moveFile(int i) {
-        // ²¾°ÊÀÉ®×
+        // ç§»å‹•æª”æ¡ˆ
         List<String> music = FileReader.getFileList(path);
         for (int index = 0; index < music.size(); index++) {
             switch (i) {
                 case 0:
                     String cmd_0 = "cmd /c  move  " + '"' + path + music.get(index) + '"' + " ./download_music";
-                    downLoadMusic = "¤w¤U¸ü   ------   " + music.get(index);
-                    ExcuteCmd(cmd_0, "²¾°Ê¥¢±Ñ¡A½Ğ¤â°Ê²¾°ÊÀÉ®×");
+                    downLoadMusic = "å·²ä¸‹è¼‰   ------   " + music.get(index);
+                    ExcuteCmd(cmd_0, "ç§»å‹•å¤±æ•—ï¼Œè«‹æ‰‹å‹•ç§»å‹•æª”æ¡ˆ");
                     break;
                 case 1:
                     String cmd_1 = "cmd /c move " + '"' + path + music.get(index) + '"' + " ./download_music/"
                             + Gui.fileName;
-                    downLoadMusic += ("¤w¤U¸ü   ------   " + music.get(index) + "\n");
-                    ExcuteCmd(cmd_1, "²¾°Ê¥¢±Ñ¡A½Ğ¤â°Ê²¾°ÊÀÉ®×");
+                    downLoadMusic += ("å·²ä¸‹è¼‰   ------   " + music.get(index) + "\n");
+                    ExcuteCmd(cmd_1, "ç§»å‹•å¤±æ•—ï¼Œè«‹æ‰‹å‹•ç§»å‹•æª”æ¡ˆ");
                     break;
             }
             if (music.get(index) == "") {
@@ -62,7 +92,7 @@ public class Youtube {
     }
 
     public static void ExcuteCmd(String cmd, String errorMsg) {
-        // °õ¦æ°õ¦æÄò
+        // åŸ·è¡ŒåŸ·è¡ŒçºŒ
         Process process;
         try {
             process = Runtime.getRuntime().exec(cmd);
@@ -73,7 +103,7 @@ public class Youtube {
                     String line = null;
                     try {
                         while ((line = in.readLine()) != null) {
-                            Gui.result.setText(errorMsg +" ---- "+ line);
+                            Gui.result.setText(errorMsg + " ---- " + line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -93,7 +123,7 @@ public class Youtube {
                     String line = null;
                     try {
                         while ((line = err.readLine()) != null) {
-                            Gui.result.setText(errorMsg +" ---- "+ line);
+                            Gui.result.setText(errorMsg + " ---- " + line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -108,7 +138,7 @@ public class Youtube {
             }.start();
             int done = process.waitFor();
             if (done != 0) {
-                // ¦pªG¤£¥¿±`°h¥X´NÃö±¼
+                // å¦‚æœä¸æ­£å¸¸é€€å‡ºå°±é—œæ‰
                 process.destroy();
                 Gui.result.setText(errorMsg);
                 return;
@@ -119,7 +149,7 @@ public class Youtube {
     }
 
     private static String getCmd(String select) {
-        // ³Ğ³y cmd
+        // å‰µé€  cmd
         if (select.equals("mp3")) {
             return "cmd /c  youtube-dl --extract-audio --audio-format mp3 " + url;
         } else {
@@ -128,16 +158,19 @@ public class Youtube {
     }
 
     public static void createFile(String file) {
-        // ³Ğ«Ø¸ê®Æ§¨
+        // å‰µå»ºè³‡æ–™å¤¾
         File f = null;
         f = new File(path + file);
         f.mkdir();
     }
 
     public static String getCurrentDirectory() {
-        // ¨ú±o·í«e¥Ø¿ı
-        File now_directory = new File(".");
-        String current_path = now_directory.getAbsolutePath().replaceAll("\\.", "");
-        return current_path;
+        // å–å¾—ç•¶å‰å·¥ä½œç›®éŒ„
+        return System.getProperty("user.dir");
+    }
+
+    public static void writeTempFile(InputStream file, String name) throws IOException, URISyntaxException {
+        Path res_path = Paths.get(getCurrentDirectory(), name);
+        Files.copy(file, res_path, StandardCopyOption.REPLACE_EXISTING);
     }
 }
